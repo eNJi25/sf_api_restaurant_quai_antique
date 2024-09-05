@@ -2,18 +2,73 @@
 
 namespace App\Controller;
 
+use App\Entity\Food;
+use App\Repository\FoodRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('api/food', name: 'app_api_food_')]
 class FoodController extends AbstractController
 {
-    #[Route('/food', name: 'app_food')]
-    public function index(): JsonResponse
+    public function __construct(private EntityManagerInterface $manager, private FoodRepository $repository)
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/FoodController.php',
-        ]);
+
+    }
+
+    #[Route(name: 'new', methods: 'POST')]
+    public function new() : Response
+    {
+        $food = new Food();
+        $food->setTitle('Burger');
+        $food->setDescription('Burger maison frais');
+        $food->setPrice(12);
+        $food->setCreatedAt(new \DateTimeImmutable());
+
+
+        $this->manager->persist($food);
+        $this->manager->flush();
+
+        return $this->json(
+            ['message' => "Food resource created with {$food->getId()} id"],
+            Response::HTTP_CREATED,
+        );
+    }
+
+    #[Route('/{id}', name: 'show', methods: 'GET')]
+    public function show(int $id) : Response
+    {
+        $food = $this->repository->findOneBy(['id' => $id]);
+        if (!$food) {
+            throw $this->createNotFoundException("No Food found for {$id} id");
+        }
+        return $this->json(
+            ['message' => "A Food was found : {$food->getTitle()} for {$food->getId()} id"]
+        );
+    }
+
+    #[Route('/{id}', name: 'edit', methods: 'PUT')]
+    public function edit(int $id) : Response
+    {
+        $food = $this->repository->findOneBy(['id' => $id]);
+        if (!$food) {
+            throw $this->createNotFoundException("No Food found for {$id} id");
+        }
+        $food->setTitle('Food name updated');
+        $this->manager->flush();
+        return $this->redirectToRoute('app_api_food_show', ['id' => $food->getId()]);
+    }
+
+    #[Route('/{id}', name: 'delete', methods: 'DELETE')]
+    public function delete(int $id) : Response
+    {
+        $food = $this->repository->findOneBy(['id' => $id]);
+        if (!$food) {
+            throw $this->createNotFoundException("No Food found for {$id} id");
+        }
+        $this->manager->remove($food);
+        $this->manager->flush();
+        return $this->json(['message' => "Food resource deleted"], Response::HTTP_NO_CONTENT);
     }
 }
