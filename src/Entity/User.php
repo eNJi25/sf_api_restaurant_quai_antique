@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Random\RandomException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +37,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $apiToken;
+
+    #[ORM\Column(length: 32)]
+    private ?string $first_name = null;
+
+    #[ORM\Column(length: 64)]
+    private ?string $last_name = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $guest_number = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $allergy = null;
 
     /** @throws RandomException */
     public function __construct()
@@ -164,6 +177,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setApiToken(string $apiToken): static
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+
+    public function setFirstName(string $first_name): static
+    {
+        $this->first_name = $first_name;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+    }
+
+    public function setLastName(string $last_name): static
+    {
+        $this->last_name = $last_name;
+
+        return $this;
+    }
+
+    public function getGuestNumber(): ?int
+    {
+        return $this->guest_number;
+    }
+
+    public function setGuestNumber(?int $guest_number): static
+    {
+        $this->guest_number = $guest_number;
+
+        return $this;
+    }
+
+    public function getAllergy(): ?string
+    {
+        return $this->allergy;
+    }
+
+    public function setAllergy(?string $allergy): static
+    {
+        $this->allergy = $allergy;
 
         return $this;
     }

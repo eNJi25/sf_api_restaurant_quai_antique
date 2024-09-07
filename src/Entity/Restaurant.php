@@ -22,14 +22,14 @@ class Restaurant
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column]
     private array $amOpeningTime = [];
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column]
     private array $pmOpeningTime = [];
 
-    #[ORM\Column]
-    private ?int $maxGuest = null;
+    #[ORM\Column(type: Types::SMALLINT)]
+    private int $maxGuest = 0;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
